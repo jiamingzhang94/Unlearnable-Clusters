@@ -1,6 +1,6 @@
 # Unlearnable Clusters: Towards Label-agnostic Unlearnable Examples
 
-https://arxiv.org/abs/2301.01217
+
 Code relative to "[Unlearnable Clusters: Towards Label-agnostic Unlearnable Examples](https://arxiv.org/abs/2301.01217)"
 
 
