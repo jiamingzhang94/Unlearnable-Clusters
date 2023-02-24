@@ -1,0 +1,9 @@
+pets:
+  num_classes: 37
+  train: '/data/datasets/classification/pets/train'
+  test: '/data/datasets/classification/pets/test'
+
+cars:
+  num_classes: 196
+  train: '/data/datasets/classification/cars/train'
+  test: '/data/datasets/classification/cars/test'

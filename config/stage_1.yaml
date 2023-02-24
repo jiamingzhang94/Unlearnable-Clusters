@@ -1,0 +1,44 @@
+
+
+uc_pets_rn50:
+  data_config: config/data.yaml
+  dataset: pets
+  perturbation_dir: output/uc_pets_rn50/perturbation
+  ae_folder: output/uc_pets_rn50/ae
+
+  model: RN50
+  checkpoint: checkpoints/RN50_imagenet.pth
+  normalize: imagenet
+  num_classes: 1000
+
+  epsilon: 16
+  lr: 1e-4
+  num_epoch: 50
+  target_offset: 1
+  norm: linf
+
+  cluster: output/cluster/pets_rn50_cluster10.pth
+  output_dir: output/uc_pets_rn50/perturbation
+
+
+uc_pets_cliprn50:
+  data_config: config/data.yaml
+  dataset: pets
+  perturbation_dir: output/uc_pets_cliprn50/perturbation
+  ae_folder: output/uc_pets_cliprn50/ae
+
+  model: CLIPRN50
+  checkpoint: checkpoints/RN50_clip.pth
+  normalize: clip
+  num_classes: 1000
+
+  epsilon: 16
+  lr: 1e-4
+  num_epoch: 50
+  target_offset: 1
+  norm: linf
+
+  cluster: output/cluster/pets_cliprn50_cluster10.pth
+  output_dir: output/uc_pets_cliprn50/perturbation
+
+

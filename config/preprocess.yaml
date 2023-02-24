@@ -1,0 +1,35 @@
+rename:
+  data_config: config/data.yaml
+  dataset: pets
+
+rename_cars:
+  data_config: config/data.yaml
+  dataset: cars
+
+
+cluster_pets_rn50_cluster10:
+  data_config: config/data.yaml
+  dataset: pets
+
+  model: RN50
+  checkpoint: checkpoints/RN50_imagenet.pth
+  normalize: imagenet
+  num_classes: 1000
+
+  num_clusters: 10
+
+  output_dir: output/cluster
+
+
+cluster_pets_cliprn50_cluster10:
+  data_config: config/data.yaml
+  dataset: pets
+
+  model: CLIPRN50
+  checkpoint: checkpoints/RN50_clip.pth
+  normalize: clip
+  num_classes: 1000
+
+  num_clusters: 10
+
+  output_dir: output/cluster

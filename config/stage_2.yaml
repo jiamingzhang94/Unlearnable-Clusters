@@ -1,0 +1,33 @@
+
+uc_pets_rn50_rn18:
+  data_config: config/data.yaml
+  dataset: pets
+  perturbation_dir: output/uc_pets_rn50/perturbation
+  ae_folder: output/uc_pets_rn50/ae
+
+  model: RN18
+  normalize: general
+
+  lr: 0.1
+  num_epoch: 90
+  batch_size: 256
+
+  cluster: output/cluster/pets_rn50_cluster10.pth
+  output_dir: output/uc_pets_rn50/rn18
+
+
+uc_pets_cliprn50_rn18:
+  data_config: config/data.yaml
+  dataset: pets
+  perturbation_dir: output/uc_pets_cliprn50/perturbation
+  ae_folder: output/uc_pets_cliprn50/ae
+
+  model: RN18
+  normalize: general
+
+  lr: 0.1
+  num_epoch: 90
+  batch_size: 256
+
+  cluster: output/cluster/pets_cliprn50_cluster10.pth
+  output_dir: output/uc_pets_cliprn50/rn18
