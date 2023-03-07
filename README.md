@@ -33,3 +33,14 @@ python main.py --config config/stage_2.yaml -e {experiment} --stage 2
 # {experiment} is uc_{dataset}_{surrogate_model}_{target_model}
 # e.g., python main.py --config config/stage_2.yaml -e uc_pets_rn50_rn18 --stage 2
 ```
+
+## Citation
+If you find this code to be useful for your research, please consider citing.
+```
+@inproceedings{zhang2023imageNet,
+  title={Unlearnable Clusters: Towards Label-agnostic Unlearnable Examples},
+  author={Jiaming Zhang, Xingjun Ma, Qi Yi, Jitao Sang, Yugang Jiang, Yaowei Wang, Changsheng Xu},
+  booktitle="Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition",
+  year={2023}
+}
+```
