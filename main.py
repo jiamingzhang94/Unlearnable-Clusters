@@ -240,8 +240,8 @@ if __name__ == '__main__':
             torch.cuda.manual_seed(args.seed)
             np.random.seed(args.seed)
             yaml.dump(config, open(os.path.join(config['output_dir'], 'config.yaml'), 'w+'))
-            train(args, config)
             generate(args, config)
+            train(args, config)
         else:
             pass
     except Exception as e:
