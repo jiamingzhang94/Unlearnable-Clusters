@@ -6,10 +6,9 @@ import numpy as np
 import os
 from pathlib import Path
 import ruamel.yaml as yaml
-
+import argparse
 from logger import MetricLogger
 from utils import get_model, normalize_list
-
 from dataset.dataCluster import DataFolderWithLabel, DataFolderWithClassNoise
 from models.generator import ResnetGenerator
 
@@ -194,7 +193,7 @@ def generate(args, config):
 
     for images, labels, noise in logger.log_every(train_loader, 50, header=header):
         if config['norm'] == 'l2':
-            temp = torch.norm(delta_im.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+            temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
             noise = noise * config['epsilon'] / temp
         else:
             noise = torch.clamp(noise, -config['epsilon'] / 255., config['epsilon'] / 255)
@@ -207,43 +206,32 @@ def generate(args, config):
             count[labels[i]] += 1
 
 
-
-import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str)
     parser.add_argument('--experiment', '-e', type=str)
-
     parser.add_argument('--device', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
-
     parser.add_argument('--stage', type=int, default=0)
-
     args = parser.parse_args()
-    
-    import traceback
-    try:
-        config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)[args.experiment]
-        data_config = yaml.load(open(config['data_config'], 'r'), Loader=yaml.Loader)[config['dataset']]
-        config['dataset'] = {'name': config['dataset'], 'config': data_config}
 
-        Path(config['output_dir']).mkdir(parents=True, exist_ok=True)
+    config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)[args.experiment]
+    data_config = yaml.load(open(config['data_config'], 'r'), Loader=yaml.Loader)[config['dataset']]
+    config['dataset'] = {'name': config['dataset'], 'config': data_config}
+    Path(config['output_dir']).mkdir(parents=True, exist_ok=True)
 
-        if args.stage == 1:
-            torch.manual_seed(args.seed)
-            torch.cuda.manual_seed(args.seed)
-            np.random.seed(args.seed)
-            yaml.dump(config, open(os.path.join(config['output_dir'], '..', 'config.yaml'), 'w+'))
-            train_gnet(args, config)
-        elif args.stage == 2:
-            torch.manual_seed(args.seed)
-            torch.cuda.manual_seed(args.seed)
-            np.random.seed(args.seed)
-            yaml.dump(config, open(os.path.join(config['output_dir'], 'config.yaml'), 'w+'))
-            generate(args, config)
-            train(args, config)
-        else:
-            pass
-    except Exception as e:
-        print(traceback.format_exc())
-        raise e
+    if args.stage == 1:
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed(args.seed)
+        np.random.seed(args.seed)
+        yaml.dump(config, open(os.path.join(config['output_dir'], '..', 'config.yaml'), 'w+'))
+        train_gnet(args, config)
+    elif args.stage == 2:
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed(args.seed)
+        np.random.seed(args.seed)
+        yaml.dump(config, open(os.path.join(config['output_dir'], 'config.yaml'), 'w+'))
+        generate(args, config)
+        train(args, config)
+    else:
+        raise KeyError
