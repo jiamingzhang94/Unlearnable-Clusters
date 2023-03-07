@@ -40,3 +40,4 @@ class ClipResnet(torch.nn.Module):
         x = self.visual_encoder(image)
         x = self.fc(x)
         return x
+

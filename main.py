@@ -8,9 +8,10 @@ from pathlib import Path
 import ruamel.yaml as yaml
 import argparse
 from logger import MetricLogger
-from utils import get_model, normalize_list
+from utils import get_surrogate, get_target, normalize_list
 from dataset.dataCluster import DataFolderWithLabel, DataFolderWithClassNoise
 from models.generator import ResnetGenerator
+from tqdm import tqdm
 
 
 def train_gnet(args, config):
@@ -23,10 +24,9 @@ def train_gnet(args, config):
 
     normalize = normalize_list[config['normalize']]
 
-    sd = torch.load(config['checkpoint'], map_location='cpu')
-    sd = sd.get('state_dict', sd)
-    net = get_model(config['model'], config['num_classes']).eval().to(args.device)
-    net.load_state_dict(sd)
+    net = get_surrogate(config['model'], config['num_classes']).eval().to(args.device)
+    # sd = torch.load(config['checkpoint'], map_location='cpu')
+    # net.load_state_dict(sd)
 
     cluster = torch.load(config['cluster'], map_location='cpu')
     num_clusters = cluster['centers'].shape[0]
@@ -112,7 +112,7 @@ def train(args, config):
     test_dataset = DataFolderWithLabel(config['dataset']['config']['test'], None, test_transform)
     test_loader = DataLoader(test_dataset, batch_size=config['batch_size'], num_workers=8)
 
-    net = get_model(config['model'], num_classes).to(args.device)
+    net = get_target(config['model'], num_classes).to(args.device)
 
     optimizer = torch.optim.SGD(net.parameters(), lr=config['lr'], momentum=0.9, weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, config['num_epoch'] * len(train_loader), eta_min=1e-6)
@@ -158,7 +158,6 @@ def train(args, config):
 
         torch.save({'state_dict': net.state_dict()}, os.path.join(config['output_dir'], 'checkpoint.pth'))
         logger.clear()
-
 
 
 def generate(args, config):
@@ -208,11 +207,11 @@ def generate(args, config):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str)
-    parser.add_argument('--experiment', '-e', type=str)
+    parser.add_argument('--config', type=str, default='config/stage_1.yaml')
+    parser.add_argument('--experiment', '-e', type=str, default='uc_pets_rn50')
     parser.add_argument('--device', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--stage', type=int, default=0)
+    parser.add_argument('--stage', type=int, default=1)
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)[args.experiment]
