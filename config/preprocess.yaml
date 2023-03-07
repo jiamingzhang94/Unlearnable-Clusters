@@ -2,9 +2,9 @@ rename:
   data_config: config/data.yaml
   dataset: pets
 
-rename_cars:
+rename_pets:
   data_config: config/data.yaml
-  dataset: cars
+  dataset: pets
 
 
 cluster_pets_rn50_cluster10:
