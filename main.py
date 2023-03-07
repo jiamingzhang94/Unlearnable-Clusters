@@ -169,7 +169,7 @@ def generate(args, config):
 
     noise = []
     for i in range(num_clusters):
-        noise.append(torch.load(os.path.join(config['perturbation_dir'], f'perturbation_{i}.pth'), map_location='cpu')['uap'])
+        noise.append(torch.load(os.path.join(config['perturbation_dir'], f'perturbation_{i}.pth'), map_location='cpu')['perturbation'])
     noise = torch.cat(noise, dim=0)
     noise = torch.clamp(noise, -config['epsilon'] / 255., config['epsilon'] / 255)
     train_dataset = DataFolderWithClassNoise(config['dataset']['config']['train'], cluster['pred_idx'], noise=noise, resize_type=config['resize_type'])
