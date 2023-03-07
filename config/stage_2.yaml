@@ -8,7 +8,7 @@ uc_pets_rn50_rn18:
   model: RN18
   normalize: general
   epsilon: 16
-  resize_type: img # img: resize images to fit noise; noise: interpolate noise to fit images
+  resize_type: img # 'img' or 'noise', img: resize images to fit noise; noise: interpolate noise to fit images
 
   lr: 0.1
   num_epoch: 90

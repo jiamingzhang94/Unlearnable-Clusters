@@ -141,23 +141,23 @@ def train(args, config):
             logger.meters['train_loss'].update(loss.item(), n=len(images))
             logger.meters['train_acc'].update(correct / len(images), n=len(images))
 
-        net.eval()
-        header = 'Test Epoch {}:'.format(epoch)
-        for images, labels, _ in logger.log_every(test_loader, 50, header=header):
-            images, labels = images.to(args.device), labels.to(args.device)
+    net.eval()
+    header = 'Test Epoch {}:'.format(epoch)
+    for images, labels, _ in logger.log_every(test_loader, 50, header=header):
+        images, labels = images.to(args.device), labels.to(args.device)
 
-            with torch.no_grad():
-                logits = net(normalize(images))
-                loss = criterion(logits, labels)
+        with torch.no_grad():
+            logits = net(normalize(images))
+            loss = criterion(logits, labels)
 
-            pred_idx = torch.argmax(logits.detach(), 1)
-            correct = (pred_idx == labels).sum().item()
+        pred_idx = torch.argmax(logits.detach(), 1)
+        correct = (pred_idx == labels).sum().item()
 
-            logger.meters['test_loss'].update(loss.item(), n=len(images))
-            logger.meters['test_acc'].update(correct / len(images), n=len(images))
+        logger.meters['test_loss'].update(loss.item(), n=len(images))
+        logger.meters['test_acc'].update(correct / len(images), n=len(images))
 
-        torch.save({'state_dict': net.state_dict()}, os.path.join(config['output_dir'], 'checkpoint.pth'))
-        logger.clear()
+    torch.save({'state_dict': net.state_dict()}, os.path.join(config['output_dir'], 'checkpoint.pth'))
+    logger.clear()
 
 
 def generate(args, config):
