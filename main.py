@@ -106,7 +106,7 @@ def train(args, config):
 
     num_classes = config['dataset']['config']['num_classes']
 
-    train_dataset = DataFolderWithLabel(config['ae_folder'], None, transform=train_transform)
+    train_dataset = DataFolderWithLabel(config['ae_dir'], None, transform=train_transform)
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=config['batch_size'], num_workers=8)
 
     test_dataset = DataFolderWithLabel(config['dataset']['config']['test'], None, test_transform)
@@ -161,23 +161,18 @@ def train(args, config):
 
 
 def generate(args, config):
-    train_transform = transforms.Compose([
-#         transforms.Resize(256),
-#         transforms.CenterCrop(224),
-        transforms.ToTensor(),
-    ])
-
     normalize = normalize_list[config['normalize']]
+    num_classes = config['dataset']['config']['num_classes']
 
     cluster = torch.load(config['cluster'], map_location='cpu')
     num_clusters = cluster['centers'].shape[0]
 
     noise = []
     for i in range(num_clusters):
-        noise.append(torch.load(os.path.join(config['perturbation_folder'], f'perturbation_{i}.pth'), map_location='cpu')['perturbation'])
+        noise.append(torch.load(os.path.join(config['perturbation_dir'], f'perturbation_{i}.pth'), map_location='cpu')['uap'])
     noise = torch.cat(noise, dim=0)
-
-    train_dataset = DataFolderWithClassNoise(config['dataset']['config']['train'], cluster['pred_idx'], train_transform, noise=noise)
+    noise = torch.clamp(noise, -config['epsilon'] / 255., config['epsilon'] / 255)
+    train_dataset = DataFolderWithClassNoise(config['dataset']['config']['train'], cluster['pred_idx'], noise=noise, resize_type=config['resize_type'])
     train_loader = DataLoader(train_dataset, batch_size=1, num_workers=8)
 
     count = [0 for _ in range(config['dataset']['config']['num_classes'])]
@@ -190,28 +185,28 @@ def generate(args, config):
     logger = MetricLogger()
     header = 'Generate cluster-wise UEs:'
 
-    for images, labels, noise in logger.log_every(train_loader, 50, header=header):
-        if config['norm'] == 'l2':
-            temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-            noise = noise * config['epsilon'] / temp
-        else:
-            noise = torch.clamp(noise, -config['epsilon'] / 255., config['epsilon'] / 255)
-        labels = labels.tolist()
-        img_size = images.size()
-        noise = torch.nn.functional.interpolate(noise, [img_size[2], img_size[3]])
-        images = torch.clamp(images + noise, 0, 1)
-        for i, item in enumerate(images):
-            save_image(images[i], os.path.join(output_dir, str(labels[i]), f'{count[labels[i]]}.png'))
-            count[labels[i]] += 1
+    count = [0 for _ in range(num_classes)]
+    for i in range(len(count)):
+        Path(os.path.join(config['output_dir'], '..', 'ae', str(i))).mkdir(parents=True, exist_ok=True)
+
+    for images, ground_truth, _ in train_loader:
+        images_adv = images
+
+        ground_truth = ground_truth.tolist()
+
+        for i in range(len(images)):
+            gt = ground_truth[i]
+            save_image(images_adv[i], os.path.join(config['output_dir'], '..', 'ae', str(gt), f'{count[gt]}.png'))
+            count[gt] += 1
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='config/stage_1.yaml')
-    parser.add_argument('--experiment', '-e', type=str, default='uc_pets_rn50')
+    parser.add_argument('--config', type=str, default='config/stage_2.yaml')
+    parser.add_argument('--experiment', '-e', type=str, default='uc_pets_cliprn50_rn18')
     parser.add_argument('--device', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--stage', type=int, default=1)
+    parser.add_argument('--stage', type=int, default=2)
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)[args.experiment]

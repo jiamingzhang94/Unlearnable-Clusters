@@ -2,6 +2,8 @@ from torch.utils.data import Dataset
 import os
 from PIL import Image
 import torch
+import torchvision.transforms as transforms
+
 
 def is_image_file(filename):
     IMG_EXTENSIONS = [
@@ -43,10 +45,20 @@ class DataFolderWithLabel(Dataset):
 
 
 class DataFolderWithClassNoise(Dataset):
-    def __init__(self, root, pred_idx, transform=None, noise=None):
+    def __init__(self, root, pred_idx, noise=None, resize_type='img'):
         self.labels = []
         self.images = []
-        self.transform = transform
+        self.resize_type = resize_type
+        if self.resize_type == 'img':
+            self.transform = transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+            ])
+        else:
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+            ])
 
         for class_name in sorted(os.listdir(root)):
             label = int(class_name)
@@ -74,7 +86,13 @@ class DataFolderWithClassNoise(Dataset):
 
         if self.transform:
             image = self.transform(image)
-        image = torch.clamp(image + self.noise[self.pred_idx[idx]], 0, 1)
+
+        if self.resize_type == 'img':
+            image = torch.clamp(image + self.noise[self.pred_idx[idx]], 0, 1)
+        else:
+            img_size = image.size()
+            noise = torch.nn.functional.interpolate(self.noise[self.pred_idx[idx]].unsqueeze(0), (img_size[1], img_size[2]))
+            image = torch.clamp(image + noise, 0, 1)
         return image, label, self.pred_idx[idx]
 
 

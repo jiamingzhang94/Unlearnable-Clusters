@@ -3,14 +3,16 @@ uc_pets_rn50_rn18:
   data_config: config/data.yaml
   dataset: pets
   perturbation_dir: output/uc_pets_rn50/perturbation
-  ae_folder: output/uc_pets_rn50/ae
+  ae_dir: output/uc_pets_rn50/ae
 
   model: RN18
   normalize: general
+  epsilon: 16
+  resize_type: img # img: resize images to fit noise; noise: interpolate noise to fit images
 
   lr: 0.1
   num_epoch: 90
-  batch_size: 256
+  batch_size: 512
 
   cluster: output/cluster/pets_rn50_cluster10.pth
   output_dir: output/uc_pets_rn50/rn18
@@ -20,14 +22,16 @@ uc_pets_cliprn50_rn18:
   data_config: config/data.yaml
   dataset: pets
   perturbation_dir: output/uc_pets_cliprn50/perturbation
-  ae_folder: output/uc_pets_cliprn50/ae
+  ae_dir: output/uc_pets_cliprn50/ae
 
   model: RN18
   normalize: general
+  epsilon: 16
+  resize_type: img
 
   lr: 0.1
   num_epoch: 90
-  batch_size: 256
+  batch_size: 512
 
   cluster: output/cluster/pets_cliprn50_cluster10.pth
   output_dir: output/uc_pets_cliprn50/rn18
