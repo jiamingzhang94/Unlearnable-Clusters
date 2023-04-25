@@ -10,7 +10,7 @@ from pathlib import Path
 import ruamel.yaml as yaml
 
 from logger import MetricLogger
-from utils import get_model, normalize_list
+from utils import get_surrogate, normalize_list
 
 from dataset.dataFolder import DataFolderWithLabel, DataFolderWithOneClass
 
