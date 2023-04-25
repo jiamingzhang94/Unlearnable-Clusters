@@ -39,7 +39,7 @@ If you find this code to be useful for your research, please consider citing.
 ```
 @inproceedings{zhang2023unlearnable,
   title={Unlearnable Clusters: Towards Label-agnostic Unlearnable Examples},
-  author={Jiaming Zhang, Xingjun Ma, Qi Yi, Jitao Sang, Yugang Jiang, Yaowei Wang, Changsheng Xu},
+  author={Jiaming Zhang, Xingjun Ma, Qi Yi, Jitao Sang, Yu-Gang Jiang, Yaowei Wang, Changsheng Xu},
   booktitle="Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition",
   year={2023}
 }
